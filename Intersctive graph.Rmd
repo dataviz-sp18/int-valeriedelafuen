@@ -1,0 +1,84 @@
+---
+title: "Interactive graph"
+author: "Valerie de la Fuente"
+date: "5/20/2018"
+output: html_document
+---
+
+#Before and after the delinquency prevention program "Todos somos Juarez"
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+hom <- read_csv("perfiles_homicidios.csv")
+```
+```{r}
+require(tidyverse)
+```
+
+```{}
+print(hom)
+```
+```{r}
+hom %>%
+count(year)
+```
+
+```{}
+install.packages("plotly")
+```
+```{r}
+library(plotly) 
+```
+```{r}
+hom15 <-
+hom %>%
+  filter(year == "2015", sex == "Ambos", escolaridad == "Todos", rango_edad == "Todos", !edo_code == "Todos") 
+
+hom06 <-
+hom %>%
+  filter(year == "2006", sex == "Ambos", escolaridad == "Todos", rango_edad == "Todos", !edo_code == "Todos") 
+```
+```{r}
+subplot(
+plot_ly(hom06, x = ~edo_nom, y = ~homtot,
+        type = "bar", name = "2006", ylim = c(0,2500)),
+plot_ly(hom15, x = ~edo_nom, y = ~homtot,
+        type = "bar", colors = "", name = "2015") %>%
+  layout(
+    title = "Total Homicides in Mexico per State")
+)
+```
+
+This visualization shows the number of total homicides in Mexico per state during 2006 and 2015. The number of homicides have increased on average in the last 9 years. We can see that during 2006 the number of states above the 500 homicides was 7 and in 2015 15 states are above that threshold. The state with more homicides in 2006 was Estado de M??xico with 1748 homicides. In 2015, the number of homicides in this state grew 54% and there was also a dramatic increase in the state of Guerrero of 67%.
+
+Due to the high rates of violence, the Mexican government implemented a pilot program of delinquency prevention in Chihuahua in 2010 called "Todos somos Ju??rez". We can see that Chihuahua was only the 4th most violent state in 2006, and that in spite of the effort in 2015 the violence increased in Chihuahua to 1,540 murders. Nevertheless, the next graphs show the progression of violence for the whole 9 years and we may see a different story.
+
+
+```{r}
+p <- hom %>%
+  filter(sex == "Ambos", escolaridad == "Todos", rango_edad == "Todos", !edo_code == "Todos") %>%
+ggplot(aes(x = edo_nom, y = homtot)) + geom_col(aes(fill = year)) + facet_wrap(~year) + theme_minimal() + theme(axis.title = element_blank(), axis.text.x=element_blank()) + theme(legend.position = "none") + ggtitle("Total Homicides in Mexico per State") 
+
+p = ggplotly(p)
+
+p
+```
+
+Here we can see that Chihuahua became the most violent state in the country in terms of homicides in 2008. In 2010 violence reached an all time high of 6,407 homicides, hence the emphasis of the government to start the delinquency prevention program there. After 2010, the violence started decreasing and in 2012 Chihuahua was not the most violent state anymore. Between 2010 and 2015 homicides decreased 216%. Hence, there's evidence that suggest that the program was effective, however, running a more formal analysis is out of the scope of this project.
+
+#Visualization choices
+
+I chose the first two graphs because they help me to show two snapshots in time with bars and grids that make an easy comparison. Interactivity is crucial for this graphs because there are 32 states and the x axis looks bad with all these names cramped together. With the interactivity, you can follow the variables easily. I used to grid in the second part with an even axis to make it easier for the viewer to compare the values over time and realize the significance of Chihuahua's murders in 2010 compared to the rest of the values. 
+
+
+
+
+
+
+
+
+
